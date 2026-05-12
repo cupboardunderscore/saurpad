@@ -1,0 +1,84 @@
+<!DOCTYPE HTML>
+<html lang="en">
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="index.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>%name%</h1>
+        </header>
+        <div class="box">
+            <h1>setup</h1>
+            <form id="setup_form" enctype="multipart/form-data" method="post" onsubmit="timezone()">
+                <h2>wifi</h2>
+                <select name="networks" id="networks" onchange="ntwchange()">
+                    <option selected="selected" disabled>Select a Wi-Fi network</option>
+                    <option disabled>---</option>
+                    %options%
+                    <option value="other">Other network</option>
+                </select>
+                <br>
+                ssid: <input type="text" name="ssid" id="ssid">
+                <br>
+                password: <input type="password" name="pass" id="pass">
+                <h2>mqtt</h2>
+                address: <input type="text" name="ip">
+                <br>
+                port: <input type="text" value="1883" name="port">
+                <br>
+                username: <input type="text" value="homeassistant" name="user">
+                <br>
+                password: <input type="password" name="mqttpass">
+                <br>
+                <input  id='tz' name='tz' type='hidden'>
+                <input  id='12h' name='12h' type='hidden'>
+                <input type="submit" value="Submit">
+            </form>
+        </div>
+    </div>
+    <script>
+        function _(el)
+        {
+            return document.getElementById(el);
+        }
+        function ntwchange()
+        {
+            var ntw = _("networks");
+            var ntwname = ntw.options[ntw.selectedIndex].text;
+            if (ntw.value == "other")
+            {
+                _("ssid").value = "";
+                _("ssid").disabled = false;
+            }
+            else
+            {
+                _("ssid").value = ntwname;
+                _("ssid").disabled = true;
+            }
+            if (ntw.value.includes("n"))
+            {
+                _("pass").disabled = true;
+            }
+            else
+            {
+                _("pass").disabled = false;
+            }
+        }
+        function timezone()
+        {
+            _("tz").value = Intl.DateTimeFormat().resolvedOptions().timeZone;
+            try
+            {
+                _("12h").value = Intl.DateTimeFormat(undefined, { hour: 'numeric' }).resolvedOptions().hour12;
+            }
+            catch (error)
+            {
+                _("12h").value = false;
+            }
+        }
+    </script>
+</body>
+</html>

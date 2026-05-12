@@ -1,0 +1,88 @@
+:root {
+    color-scheme: light dark;
+    --grey-100: light-dark(#f3f4f6, #111827);
+    --grey-200: light-dark(#e5e7eb, #1f2937);
+    --grey-300: light-dark(#d1d5db, #374151);
+    --grey-400: light-dark(#9ca3af, #4b5563);
+    --grey-500: light-dark(#6b7280, #9ca3af);
+    --grey-600: light-dark(#4b5563, #9ca3af);
+    --grey-700: light-dark(#374151, #d1d5db);
+    --grey-800: light-dark(#1f2937, #e5e7eb);
+    --grey-900: light-dark(#111827, #f3f4f6);
+    --green-200: light-dark(#bbf7d0, #166534);
+    --green-700: light-dark(#15803d, #bbf7d0);
+    --orange-200: light-dark(#fed7aa, #b45309);
+    --orange-700: light-dark(#b45309, #fed7aa);
+    --red-200: light-dark(#fea0a0, #861111);
+    --cyan-500: #06b6d4;
+    --blue-400: light-dark(#2563eb, #60a5fa);
+}
+
+@media screen and (max-device-width: 1024px)
+{
+    :root
+    {
+        --grey-100: light-dark(#f3f4f6, #000000);
+        --grey-200: light-dark(#e5e7eb, #2b2b2b);
+        --grey-300: light-dark(#d1d5db, #454545);
+        --grey-400: light-dark(#9ca3af, #575757);
+        --grey-500: light-dark(#6b7280, #9ca3af);
+        --grey-600: light-dark(#575757, #9ca3af);
+        --grey-700: light-dark(#454545, #d1d5db);
+        --grey-800: light-dark(#2b2b2b, #e5e7eb);
+        --grey-900: light-dark(#1c1c1c, #f3f4f6);
+    }
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", Inter, Roboto, "Helvetica Neue", sans-serif;
+    margin: 0;
+    padding: 1rem;
+    background-color: var(--grey-100);
+    color: var(--grey-900);
+    .container {
+        max-width: 900px;
+        margin-inline: auto;
+        header {
+            h1 {
+                font-size: 3.5rem;
+            }
+            text-align: center;
+        }
+    }
+    .box
+    {
+        h1
+        {
+            margin-top: 0;
+            text-align: center;
+        }
+        h2
+        {
+            margin-top: 1rem;
+        }
+        h3,h4
+        {
+            margin-top: 1rem;
+            margin-bottom: 0.5rem;
+        }
+        background-color: var(--grey-300);
+        border: solid var(--grey-600);
+        border-radius: 25px;
+        padding: 2%;
+        max-width: 450px;
+        height: fit-content;
+        margin-left: auto;
+        margin-right: auto;
+        margin-top: 5%;
+    }
+}
+
+input,select
+{
+    font-size: medium;
+}
+
+h1,h2,h3,p {
+    margin-bottom: 0;
+}

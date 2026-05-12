@@ -1,0 +1,59 @@
+{
+    "dev": {
+        "ids": "bwav1",
+        "name": "saur'pad",
+        "mf": "cupboard_",
+        "mdl": "saurpad",
+        "sw": "",
+        "sn": "bwav1",
+        "hw": ""
+    },
+    "o": {
+        "name": "saurpadmqtt",
+        "sw": "",
+        "url": "https://github.com/cupboardunderscore/saurpad"
+    },
+    "cmps": {
+        "saurpad_tem": {
+            "p": "sensor",
+            "device_class": "temperature",
+            "state_class": "measurement",
+            "unit_of_measurement": "°C",
+            "value_template": "{{ value_json.temperature}}",
+            "unique_id": "saurpad_t"
+        },
+        "saurpad_hum": {
+            "p": "sensor",
+            "device_class": "humidity",
+            "state_class": "measurement",
+            "unit_of_measurement": "%",
+            "value_template": "{{ value_json.humidity}}",
+            "unique_id": "saurpad_h"
+        },
+        "saurpad_lig": {
+            "p": "sensor",
+            "device_class": "illuminance",
+            "state_class": "measurement",
+            "unit_of_measurement": "lx",
+            "value_template": "{{ value_json.illuminance}}",
+            "unique_id": "saurpad_l"
+        },
+        "saurpad_bat": {
+            "p": "sensor",
+            "device_class": "battery",
+            "state_class": "measurement",
+            "unit_of_measurement": "%",
+            "value_template": "{{ value_json.battery}}",
+            "unique_id": "saurpad_b"
+        },
+        "saurpad_cha": {
+            "p": "binary_sensor",
+            "device_class": "battery_charging",
+            "state_class": "measurement",
+            "value_template": "{{ value_json.battery_charging}}",
+            "unique_id": "saurpad_c"
+        }
+    },
+    "state_topic": "saurpad/state",
+    "qos": 0
+}

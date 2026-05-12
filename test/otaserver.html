@@ -1,0 +1,146 @@
+<!DOCTYPE HTML>
+<html lang="en">
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="index.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>%name%</h1>
+            <h4>firmware version: %v%</h4>
+        </header>
+        <div class="box">
+            <h2>OTA update</h2>
+            <p>
+                <form id="upload_form" enctype="multipart/form-data" method="post">
+                    <input type="file" name="file1" id="file1" onchange="upload()">
+                    <br>
+                    <progress id="progressbar" value="0" max="100" style="width:100%;"></progress>
+                    <h3 id="status"></h3>
+                </form>
+            </p>
+            <p id="status"></p>
+            <h2>sensors</h2>
+            Temperature = %tem%
+            <br>
+            Humidity = %hum%
+            <br>
+            Light = %lig%
+            <br>
+            Battery = %bat%
+            <br>
+            <br>
+            ssid = %ssid%
+            <br>
+            rssi = %rssi%
+            <br>
+            <br>
+            <div style="cursor: pointer;" onclick="showhide()">
+                <b style="padding-right: 5px;">configuration</b>
+                <i id="arrow" style="border: solid var(--grey-900); border-width: 0 3px 3px 0; display: inline-block; padding: 3px; transform: rotate(45deg);"></i>
+            </div>
+            <div id="conf" style="display: none;">
+                <h4>brightness</h4>
+                <input type="checkbox" id="autocheck" %auto% onchange="auto()"> auto
+                <br>
+                <input name="manual" id="manual" %man% type="number" value="%manual%" onchange="update(this)"> 
+                <h4>intervals</h4>
+                display refresh <input name="display" type="number" value="%display%" onchange="update(this)"> ms
+                <br>
+                screen change <input name="screen" type="number" value="%screen%" onchange="update(this)"> s
+                <br>
+                <a title="ambient light & batter capacity">sensors 1 </a><input name="sensors" type="number" value="%sensors%" onchange="update(this)"> s
+                <br>
+                <a title="temperature & relative humidity">sensors 2 </a><input name="mqtt" type="number" value="%mqtt%" onchange="update(this)"> s
+                <br>
+                warning check <input name="warning" type="number" value="%warning%" onchange="update(this)"> ms
+            </div>
+        </div>
+    </div>
+    <script>
+        function _(el)
+        {
+            return document.getElementById(el);
+        }
+        function upload()
+        {
+            var file = _("file1").files[0];
+            if (file.name == "firmware.bin")
+            {
+                var formdata = new FormData();
+                formdata.append("file1", file);
+                var ajax = new XMLHttpRequest();
+                ajax.upload.addEventListener("progress", progress, false);
+                ajax.addEventListener("load", finish, false);
+                ajax.addEventListener("error", err, false);
+                ajax.open("POST", "/upload");
+                ajax.send(formdata);
+            }
+            else
+            {
+                alert("wrong filename, use \"firmware.bin\"");
+            }
+        }
+        function progress(event)
+        {
+            var percent = (event.loaded / event.total) * 100;
+            _("progressbar").value = Math.round(percent);
+            _("status").innerHTML = Math.round(percent) + "% uploaded";
+            if (percent >= 100)
+            {
+                _("status").innerHTML = "writing file to filesystem";
+            }
+        }
+        function finish(event)
+        {
+            _("status").innerHTML = "upload complete";
+            _("progressbar").value = 0;
+        }
+        function err(event)
+        {
+            alert("upload failed");
+        }
+        function showhide()
+        {
+            if (_("conf").style.display == "none")
+            {
+                _("conf").style = "";
+                _("arrow").style.transform = "rotate(225deg)";
+            }
+            else
+            {
+                _("conf").style = "display: none;";
+                _("arrow").style.transform = "rotate(45deg)";
+            }
+        }
+        function auto()
+        {
+            var formdata = new FormData();
+            if (_("autocheck").checked)
+            {
+                _("manual").style = "display: none;";
+                formdata.append("auto", true);
+            }
+            else
+            {
+                _("manual").style = "";
+                formdata.append("auto", false);
+                formdata.append("manual", _("manual").value);
+            }
+            var ajax = new XMLHttpRequest();
+            ajax.open("POST", "/conf");
+            ajax.send(formdata);
+        }
+        function update(el)
+        {
+            var formdata = new FormData();
+            formdata.append(el.name, el.value);
+            var ajax = new XMLHttpRequest();
+            ajax.open("POST", "/conf");
+            ajax.send(formdata);
+        }
+        </script>
+</body>
+</html>
