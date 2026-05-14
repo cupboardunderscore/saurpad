@@ -80,6 +80,7 @@ bool b1c = true, b2c = true, b1l = true, b2l = true;
 unsigned long held1 = 0, held2 = 0;
 String lastupdatedsens = "";
 bool h12 = false;
+String uniqueid = "";
 
 otaserver *ota;
 devices *dv;
@@ -146,7 +147,7 @@ void updatedisplay(int page = currentpage)
     int y = 0;
     while (y < page*8 && x < device.size())
     {
-        if (device[x].friendly_name != "" || device[x].get_state() != "0 None" || device[x].name == "sensor." + String(defaultname) + "_battery")
+        if (device[x].friendly_name != "" || device[x].get_state() != "0 None" || (device[x].name.startsWith("sensor." + String(defaultname)) && device[x].name.endsWith("_battery")))
         {
             y++;
         }
@@ -155,17 +156,17 @@ void updatedisplay(int page = currentpage)
     y = 0;
     while (x < device.size() && y < 8)
     {
-        if (device[x].name == "sensor." + String(defaultname) +  "_battery")
+        if (device[x].name == "sensor." + String(defaultname) + "_" + uniqueid +  "_battery")
         {
             device[x].set_state(batt);
             device[x].set_updated(lastupdatedsens + "+00:00");
         }
-        else if (device[x].name == "sensor." + String(defaultname) +  "_illuminance")
+        else if (device[x].name == "sensor." + String(defaultname) + "_" + uniqueid +  "_illuminance")
         {
             device[x].set_state(lx);
             device[x].set_updated(lastupdatedsens + "+00:00");
         }
-        if (device[x].friendly_name == "" || device[x].get_state() == "0 None" || device[x].name == "sensor." + String(defaultname) + "_battery")
+        if (device[x].friendly_name == "" || device[x].get_state() == "0 None" || (device[x].name.startsWith("sensor." + String(defaultname)) && device[x].name.endsWith("_battery")))
         {
             x++;
             continue;
@@ -291,8 +292,8 @@ void messageHandler(String &topic, String &message)
 {
     if (topic == "homeassistant/status" && message == "online")
     {
-        mqtt.publish(String(defaultname) + "/done", "done");
-        mqtt.publish("homeassistant/device/" + String(defaultname) + "/config", jsn(), false, 1);
+        mqtt.publish(String(defaultname) + "/" + uniqueid, "online");
+        mqtt.publish("homeassistant/device/" + String(defaultname) + "_" + uniqueid + "/config", jsn(), false, 1);
     }
     else if (topic == "homeassistant/done" && message == "done")
     {
@@ -318,7 +319,7 @@ void messageHandler(String &topic, String &message)
                 return;
             }
         }
-        if (devname == "homeassistant.homeassistant" || devname == "status.status" || devname == "binary_sensor." + String(defaultname) + "_charging" || message == "remove")
+        if (devname == "homeassistant.homeassistant" || devname == "status.status" || (devname.startsWith("binary_sensor." + String(defaultname)) && devname.endsWith("_charging")) || message == "remove")
         {
             return;
         }
@@ -475,8 +476,7 @@ void sendloop(void *pvParameters)
         ota->hum = String(hum.relative_humidity) + "%%";
         String pub = "{\"temperature\": " + String(tem.temperature) + ", \"humidity\": " + String(hum.relative_humidity) + ", \"illuminance\": " + String(lx) + ", \"battery\": " + String(batt) + ", \"battery_charging\": " + String((chr8 > 0)? "\"ON\"" : "\"OFF\"") + "}";
         Serial.println(pub);
-        mqtt.publish(String(defaultname) + "/state", pub);
-        mqtt.publish("bV", String(bat.cellVoltage(), 4));
+        mqtt.publish(String(defaultname) + "/" + uniqueid + "/state", pub);
         vTaskDelay((ota->send * 1000) / portTICK_PERIOD_MS);
     }
 }
@@ -724,7 +724,21 @@ void setup()
     MP3Player::init(speak);
 
     String prnt;
-    settings.begin("thingy", false);
+    settings.begin(defaultname, false);
+    if (!settings.isKey("uniqueid"))
+    {
+        String chars = "AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz1234567890";
+        for (int i = 0; i < 4; i++)
+        {
+            int t = random(0, chars.length());
+            uniqueid = uniqueid + chars[t];
+        }
+        settings.putString("uniqueid", uniqueid);
+    }
+    else
+    {
+        uniqueid = settings.getString("uniqueid");
+    }
     volume = settings.getDouble("volume", volume);
     lastvolume = volume;
     setupdisplay();
@@ -766,9 +780,9 @@ void setup()
         wifisetup set;
         String qr;
         loadScreen(SCREEN_ID_WIFI);
-        lv_label_set_text(objects.ssid, ("ssid = \"" + String(defaultname) + "\"").c_str());
+        lv_label_set_text(objects.ssid, ("ssid = \"" + String(defaultname) + "_" + uniqueid + "\"").c_str());
         lv_label_set_text(objects.pass, ("pass = \"" + set.pass + "\"").c_str());
-        qr = "WIFI:T:WPA;S:" + String(defaultname) + ";P:" + set.pass + ";;";
+        qr = "WIFI:T:WPA;S:" + String(defaultname) + "_" + uniqueid + ";P:" + set.pass + ";;";
         lv_qrcode_update(objects.wifi_qr, qr.c_str(), strlen(qr.c_str()));
         lv_obj_clear_flag(objects.wifi_qr, LV_OBJ_FLAG_HIDDEN);
         lv_label_set_text(objects.ip, ("ip address = \"" + set.ip + "\"").c_str());
@@ -819,7 +833,7 @@ void setup()
     Serial.println("WiFi connected");
     Serial.print("IP address: ");
     Serial.println(WiFi.localIP());
-    MDNS.begin(defaultname);
+    MDNS.begin(String(defaultname) + "_" + uniqueid);
     MDNS.addService("_http", "_tcp", 80);
     ota = new otaserver;
     ota->ssid = WiFi.SSID();
@@ -831,9 +845,10 @@ void setup()
     prnt = "username = " + settings.getString("mqtt/user") + ", password = " + settings.getString("mqtt/pass");
     lv_label_set_text(objects.startup_subtext, prnt.c_str());
     mqtt.begin(settings.getString("mqtt/address").c_str(), settings.getInt("mqtt/port"), network);
+    mqtt.setWill((String(defaultname) + "/" + uniqueid).c_str(), "offline");
     mqtt.onMessage(messageHandler);
     lv_label_set_text(objects.startup_subtext, prnt.c_str());
-    while (!mqtt.connect(defaultname, settings.getString("mqtt/user").c_str(), settings.getString("mqtt/pass").c_str()))
+    while (!mqtt.connect((String(defaultname) + "_" + uniqueid).c_str(), settings.getString("mqtt/user").c_str(), settings.getString("mqtt/pass").c_str()))
     {
         if (!WiFi.isConnected())
         {
@@ -885,8 +900,8 @@ void setup()
     timeClient.end();
     loc.setLocation(settings.getString("tz", "Etc/UTC"));
     h12 = settings.getBool("12h");
-    mqtt.publish("homeassistant/device/" + String(defaultname) + "/config", jsn(), false, 1);
-    mqtt.publish(String(defaultname) + "/done", "done");
+    mqtt.publish("homeassistant/device/" + String(defaultname) + "_" + uniqueid + "/config", jsn(), false, 1);
+    mqtt.publish(String(defaultname) + "/" + uniqueid, "online");
     i2cmutex = xSemaphoreCreateMutex();
     if (i2cmutex == NULL)
     {
@@ -1005,7 +1020,7 @@ void loop()
     {
         if (i.friendly_name != "" && i.get_state() != "0 None")
         {
-            if (i.name != "sensor." + String(defaultname) + "_battery")
+            if (!(i.name.startsWith("sensor." + String(defaultname)) && i.name.endsWith("_battery")))
             {
                 devicecount++;
             }

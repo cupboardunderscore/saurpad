@@ -3,6 +3,7 @@
 wifisetup::wifisetup()
 {
     settings.begin(defaultname, false);
+    String uniqueid = settings.getString("uniqueid");
     String prnt;
     WiFi.mode(WIFI_STA);
     WiFi.disconnect();
@@ -108,13 +109,13 @@ wifisetup::wifisetup()
         int t = random(0, chars.length());
         pass = pass + chars[t];
     }
-    Serial.println("ssid = \"" + String(defaultname) + "\"");
+    Serial.println("ssid = \"" + String(defaultname) + "_" + uniqueid + "\"");
     Serial.println("pass = \"" + pass + "\"");
 
-    WiFi.softAP(defaultname, pass, channel);
+    WiFi.softAP(String(defaultname) + "_" + uniqueid, pass, channel);
     Serial.println("ip address = \"" + WiFi.softAPIP().toString() + "\"");
     ip = WiFi.softAPIP().toString();
-    MDNS.begin(defaultname);
+    MDNS.begin(String(defaultname) + "_" + uniqueid);
     MDNS.addService("_http", "_tcp", 80);
 
     server->on("/", HTTP_GET, [&](AsyncWebServerRequest *request){request->send(200, "text/html", index_set, [&](const String &var){return repl(var);});});

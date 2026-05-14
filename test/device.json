@@ -54,6 +54,11 @@
             "unique_id": "saurpad_c"
         }
     },
+    "availability": {
+        "topic": "saurpad",
+        "payload_available": "online",
+        "payload_not_available": "offline"
+    },
     "state_topic": "saurpad/state",
     "qos": 0
 }

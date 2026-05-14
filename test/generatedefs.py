@@ -30,7 +30,7 @@ defs = """
 #define defaultname "saurpad"
 #define namestyle "saur\'pad"
 #define ver "0.1-{}"
-#define mver "0.2"
+#define mver "0.3"
 #define hver "0.1"
 
 #define SD_CS 10
