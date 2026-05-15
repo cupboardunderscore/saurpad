@@ -1,6 +1,6 @@
 #include "images.h"
 
-const ext_img_desc_t images[11] = {
+const ext_img_desc_t images[12] = {
     { "wifi-1", &img_wifi_1 },
     { "wifi-2", &img_wifi_2 },
     { "wifi-3", &img_wifi_3 },
@@ -12,4 +12,5 @@ const ext_img_desc_t images[11] = {
     { "bolt", &img_bolt },
     { "bolt-full", &img_bolt_full },
     { "volume-mute", &img_volume_mute },
+    { "sauropod", &img_sauropod },
 };

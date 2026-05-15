@@ -277,14 +277,6 @@ void sendtoclass(String message, devices &dev)
     {
         dev.area_name = area_name;
     }
-    /*else
-    {
-        Serial.print(dev.name);
-        Serial.print(": ");
-        Serial.print(action);
-        Serial.print(" - ");
-        Serial.println(message);
-    }*/
     std::stable_sort(device.begin(), device.end());
 }
 
@@ -578,7 +570,6 @@ void blinkloop(void *pvParameters)
                         break;
 					}
                     temp = String(split);
-                    Serial.println(temp);
                     if (temp.indexOf("r") >= 0)
                     {
                         r->on();
@@ -723,7 +714,6 @@ void setup()
     speak->start();
     MP3Player::init(speak);
 
-    String prnt;
     settings.begin(defaultname, false);
     if (!settings.isKey("uniqueid"))
     {
@@ -797,14 +787,12 @@ void setup()
         ESP.restart();
     }
 
-    prnt = "ssid = \"" + settings.getString("wifi/ssid") + "\"";
-    Serial.println(prnt);
-    lv_label_set_text(objects.startup_text, prnt.c_str());
+    Serial.println("ssid = \"" + settings.getString("wifi/ssid") + "\"");
+    lv_label_set_text(objects.startup_text, namestyle);
+    lv_label_set_text(objects.startup_subtext, "Connecting to Wi-Fi network");
     if (settings.isKey("wifi/pass"))
     {
-        prnt = "pass = \"" + settings.getString("wifi/pass") + "\"";
-        Serial.println(prnt);
-        lv_label_set_text(objects.startup_subtext, prnt.c_str());
+        Serial.println("pass = \"" + settings.getString("wifi/pass") + "\"");
         WiFi.begin(settings.getString("wifi/ssid"), settings.getString("wifi/pass"));
     }
     else
@@ -827,10 +815,12 @@ void setup()
                 ESP.restart();
             }
         }
+        Serial.print(".");
         delay(500);
     }
+    lv_label_set_text(objects.startup_subtext, "Wi-Fi connected");
     Serial.println("");
-    Serial.println("WiFi connected");
+    Serial.println("Wi-Fi connected");
     Serial.print("IP address: ");
     Serial.println(WiFi.localIP());
     MDNS.begin(String(defaultname) + "_" + uniqueid);
@@ -838,16 +828,12 @@ void setup()
     ota = new otaserver;
     ota->ssid = WiFi.SSID();
 
-    prnt = "mqtt = \"" + settings.getString("mqtt/address") + ":" + settings.getInt("mqtt/port") + "\"";
-    Serial.println(prnt);
-    lv_label_set_text(objects.startup_text, prnt.c_str());
-
-    prnt = "username = " + settings.getString("mqtt/user") + ", password = " + settings.getString("mqtt/pass");
-    lv_label_set_text(objects.startup_subtext, prnt.c_str());
+    Serial.println("mqtt = \"" + settings.getString("mqtt/address") + ":" + settings.getInt("mqtt/port") + "\"");
+    Serial.println("username = " + settings.getString("mqtt/user") + ", password = " + settings.getString("mqtt/pass"));
     mqtt.begin(settings.getString("mqtt/address").c_str(), settings.getInt("mqtt/port"), network);
     mqtt.setWill((String(defaultname) + "/" + uniqueid).c_str(), "offline");
     mqtt.onMessage(messageHandler);
-    lv_label_set_text(objects.startup_subtext, prnt.c_str());
+    lv_label_set_text(objects.startup_subtext, "Connecting to MQTT broker");
     while (!mqtt.connect((String(defaultname) + "_" + uniqueid).c_str(), settings.getString("mqtt/user").c_str(), settings.getString("mqtt/pass").c_str()))
     {
         if (!WiFi.isConnected())
@@ -888,6 +874,7 @@ void setup()
         ESP.restart();
     }
     Serial.println("MQTT broker Connected!");
+    lv_label_set_text(objects.startup_subtext, "MQTT broker Connected");
     rtc.disable32K();
     th.setPrecision(SHT4X_HIGH_PRECISION);
     th.setHeater(SHT4X_NO_HEATER);
