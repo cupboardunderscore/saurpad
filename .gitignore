@@ -1,5 +1,5 @@
-.pio
-.vscode
-.DS_Store
-include/defs.hpp
-pio
+ESP32/.pio
+ESP32/.vscode
+*.DS_Store
+ESP32/include/defs.hpp
+ESP32/pio
