@@ -415,19 +415,6 @@ void sensorsloop(void *pvParameters)
             now = rtc.now();
             xSemaphoreGive(i2cmutex);
         }
-        /*if (batt < 50 && chr8 < 0 && batV < 3.8)
-        {
-            float batcur = batt;
-            batt = 97.96*batV*batV - 603.88*batV + 930.62;
-            if (batt < batcur)
-            {
-                batt = batcur;
-            }
-            if (batV <= 3)
-            {
-                batt = 0;
-            }
-        }*/
         if (batt > 100)
         {
             batt = 100;
@@ -746,19 +733,6 @@ void setup()
             {
                 lv_label_set_text(objects.updatetext, "done c:");
             }
-            /*while (true)
-            {
-                if (!expd.digitalRead(P7))
-                {
-                    SD.remove("/firmware.bin");
-                    break;
-                }
-                if (!expd.digitalRead(P6))
-                {
-                    break;
-                }
-                delay(10);
-            }*/
             SD.remove("/firmware.bin");
             delay(200);
             ESP.restart();
