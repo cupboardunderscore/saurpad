@@ -1,0 +1,60 @@
+blueprint:
+  name: saur'pad startup
+  domain: automation
+  author: cupboard_
+  homeassistant:
+    min_version: 2024.6.0
+  input:
+    extra_device:
+      name: extra devices
+      description: these devices will also be tracked and shown on saur'pad
+      selector:
+        entity:
+          multiple: true
+
+triggers:
+  - trigger: mqtt
+    topic: saurpad/+
+    payload: online
+variables:
+  extra_devices: !input extra_device
+conditions: []
+actions:
+  - repeat:
+      for_each: >-
+        {{ expand(states.sensor, states.binary_sensor, states.air_quality,
+        states.cover, extra_devices) | map(attribute='entity_id')
+        | list | reject('is_state', 'unknown') | list | reject('is_state',
+        'unavailable') | list | reject('contains', 'sensor.sun') | list |
+        reject('contains', 'sensor.backup_backup_manager_state') | list |
+        reject('contains', 'sensor.local_ip') | list }}
+      sequence:
+        - action: mqtt.publish
+          metadata: {}
+          data:
+            evaluate_payload: true
+            qos: "0"
+            retain: false
+            topic: homeassistant/{{repeat.item}}
+            payload: >-
+              {"state": "{{states(repeat.item, rounded=False,
+              with_unit=False)}}", "device_class": {% if state_attr(repeat.item,
+              'device_class') is none %}""{% else %}"{{state_attr(repeat.item,
+              'device_class')}}"{% endif %}, "unit_of_measurement": {% if
+              state_attr(repeat.item, 'unit_of_measurement') is none %}""{% else
+              %}"{{state_attr(repeat.item, 'unit_of_measurement')}}"{% endif %},
+              "friendly_name": {% if state_attr(repeat.item, 'friendly_name') is
+              none %}""{% else %}"{{state_attr(repeat.item,
+              'friendly_name')}}"{% endif %}, "last_updated":
+              "{{states[repeat.item].last_updated.isoformat()}}", "area_name":
+              {% if area_name(repeat.item) is none %}""{% else
+              %}"{{area_name(repeat.item)}}"{% endif %}}
+  - action: mqtt.publish
+    metadata: {}
+    data:
+      evaluate_payload: false
+      qos: "0"
+      retain: false
+      topic: homeassistant/done
+      payload: done
+mode: queued

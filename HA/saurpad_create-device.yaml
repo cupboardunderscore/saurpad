@@ -1,0 +1,44 @@
+blueprint:
+  name: saur'pad create device
+  domain: automation
+  author: cupboard_
+
+triggers:
+  - event_type: entity_registry_updated
+    event_data:
+      action: create
+    trigger: event
+conditions:
+  - condition: template
+    value_template: >-
+      {{ 'binary_sensor.' in trigger.event.data.entity_id or 'sensor.' in
+      trigger.event.data.entity_id or 'air_quality.' in
+      trigger.event.data.entity_id or 'cover.' in trigger.event.data.entity_id
+      }}
+actions:
+  - sequence:
+      - action: mqtt.publish
+        metadata: {}
+        data:
+          evaluate_payload: true
+          qos: "0"
+          retain: false
+          topic: homeassistant/{{trigger.event.data.entity_id}}
+          payload: >-
+            {"state": "{{states(trigger.event.data.entity_id, rounded=False,
+            with_unit=False)}}", "device_class": {% if
+            state_attr(trigger.event.data.entity_id, 'device_class') is none
+            %}""{% else %}"{{state_attr(trigger.event.data.entity_id,
+            'device_class')}}"{% endif %}, "unit_of_measurement": {% if
+            state_attr(trigger.event.data.entity_id, 'unit_of_measurement') is
+            none %}""{% else %}"{{state_attr(trigger.event.data.entity_id,
+            'unit_of_measurement')}}"{% endif %}, "friendly_name": {% if
+            state_attr(trigger.event.data.entity_id, 'friendly_name') is none
+            %}""{% else %}"{{state_attr(trigger.event.data.entity_id,
+            'friendly_name')}}"{% endif %}, "last_updated":
+            "{{states[trigger.event.data.entity_id].last_updated.isoformat()}}",
+            "area_name": {% if area_name(trigger.event.data.entity_id) is none
+            %}""{% else %}"{{area_name(trigger.event.data.entity_id)}}"{% endif
+            %}}
+mode: parallel
+max: 10

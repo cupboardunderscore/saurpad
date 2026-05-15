@@ -1,0 +1,44 @@
+blueprint:
+  name: saur'pad state update
+  domain: automation
+  author: cupboard_
+  homeassistant:
+    min_version: 2024.6.0
+  input:
+    extra_device:
+      name: extra devices
+      description: these devices will also be tracked and shown on saur'pad
+      selector:
+        entity:
+          multiple: true
+
+triggers:
+  - event_type: state_changed
+    trigger: event
+variables:
+  extra_devices: !input extra_device
+conditions:
+  - condition: template
+    value_template: >-
+      {{ 'binary_sensor.' in trigger.event.data.entity_id or 'sensor.' in
+      trigger.event.data.entity_id or 'air_quality.' in
+      trigger.event.data.entity_id or 'cover.' in trigger.event.data.entity_id
+      or trigger.event.data.entity_id in extra_devices }}
+actions:
+  - sequence:
+      - action: mqtt.publish
+        metadata: {}
+        data:
+          evaluate_payload: true
+          qos: "0"
+          retain: false
+          topic: homeassistant/{{trigger.event.data.entity_id}}
+          payload: >-
+            {"state": "{{states(trigger.event.data.entity_id, rounded=False,
+            with_unit=False)}}", "unit_of_measurement": {% if
+            state_attr(trigger.event.data.entity_id, 'unit_of_measurement') is
+            none %}""{% else %}"{{state_attr(trigger.event.data.entity_id,
+            'unit_of_measurement')}}"{% endif %}, "last_updated":
+            "{{states[trigger.event.data.entity_id].last_updated.isoformat()}}"}
+mode: parallel
+max: 10
