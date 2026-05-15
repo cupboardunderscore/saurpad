@@ -20,4 +20,4 @@ HA blueprints:
 
 <img width="1600" height="960" alt="image" src="https://github.com/user-attachments/assets/4b03cb79-da8c-478c-80eb-984c09380779" />
 
-<img width="1600" height="960" alt="image" src="https://github.com/user-attachments/assets/b8bce322-0108-4bf6-a5ea-7c990262acad" />
+<img width="1600" height="960" alt="image" src="https://github.com/user-attachments/assets/3d802e1a-170d-4191-bd7a-03d4e782606e" />
