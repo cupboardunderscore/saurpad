@@ -4,7 +4,7 @@
 
 #include "defs.hpp"
 
-String jsn()
+String jsn(String uniqueid)
 {
     JsonDocument doc;
 

@@ -285,7 +285,7 @@ void messageHandler(String &topic, String &message)
     if (topic == "homeassistant/status" && message == "online")
     {
         mqtt.publish(String(defaultname) + "/" + uniqueid, "online");
-        mqtt.publish("homeassistant/device/" + String(defaultname) + "_" + uniqueid + "/config", jsn(), false, 1);
+        mqtt.publish("homeassistant/device/" + String(defaultname) + "_" + uniqueid + "/config", jsn(uniqueid), false, 1);
     }
     else if (topic == "homeassistant/done" && message == "done")
     {
@@ -861,7 +861,7 @@ void setup()
     timeClient.end();
     loc.setLocation(settings.getString("tz", "Etc/UTC"));
     h12 = settings.getBool("12h");
-    mqtt.publish("homeassistant/device/" + String(defaultname) + "_" + uniqueid + "/config", jsn(), false, 1);
+    mqtt.publish("homeassistant/device/" + String(defaultname) + "_" + uniqueid + "/config", jsn(uniqueid), false, 1);
     mqtt.publish(String(defaultname) + "/" + uniqueid, "online");
     i2cmutex = xSemaphoreCreateMutex();
     if (i2cmutex == NULL)
