@@ -22,6 +22,7 @@
 #include <MP3Player.h>
 #include <ArduinoJson.h>
 #include <ESPmDNS.h>
+#include <nvs_flash.h>
 
 #include "defs.hpp"
 #include "wifisetup.h"
@@ -618,7 +619,8 @@ void buttonloop(void *pvParameters)
         b2c = expd.digitalRead(P6);
         if (b1c == false && b1l == false && (millis() - held1 >= 5000))
         {
-            settings.putBool("setup", false);
+            nvs_flash_erase();
+            nvs_flash_init();
             speak->stop();
             ESP.restart();
         }
