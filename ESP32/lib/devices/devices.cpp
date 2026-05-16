@@ -113,7 +113,15 @@ void devices::set_updated(String tie)
 
 String devices::get_updated(unsigned long current)
 {
-    unsigned long difference = current - this->last_updated;
+    unsigned long difference;
+    if (current < this->last_updated)
+    {
+        difference = 0;
+    }
+    else
+    {
+        difference = current - this->last_updated;
+    }
     int diff = 0;
     String returndiff;
     if (difference > 31556952)
@@ -209,7 +217,15 @@ bool devices::get_warning(unsigned long current)
     {
         return false;
     }
-    unsigned long difference = current - this->last_updated;
+    unsigned long difference;
+    if (current < this->last_updated)
+    {
+        difference = 0;
+    }
+    else
+    {
+        difference = current - this->last_updated;
+    }
     if
     (
         (!this->binary  &&  this->device_class == "battery"             && this->state <=   20                      ) ||
