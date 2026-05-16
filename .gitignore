@@ -4,4 +4,5 @@ ESP32/.vscode
 ESP32/include/defs.hpp
 ESP32/pio
 ESP32/lib/ui
+ESP32/test/v.txt
 *.eez-project-ui-state
