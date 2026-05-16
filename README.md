@@ -86,3 +86,13 @@ flashes each color for 1s with 0,5s breaks, then turn every color on for 0,5s
 </details>
 
 - room audio files can be added in `saurpad/rooms` named `<room_name>.mp3`
+
+## Acknowledgments
+- Status bar icons form Uicons by [Flaticon](https://www.flaticon.com/uicons)
+- Sauropod emoji from [SerenityOS Emoji Font](https://github.com/linusg/serenityos-emoji-font), Copyright (c) 2018-2023, the SerenityOS developers,
+Copyright (c) 2022-2023, Gegga Thor <xexxa@serenityos.org> - [LICENSE](https://github.com/linusg/serenityos-emoji-font/blob/main/LICENSE)
+- Source Code Pro font from [Google Fonts](https://fonts.google.com/specimen/Source+Code+Pro) by Paul D. Hunt - [SIL OPEN FONT LICENSE Version 1.1](https://fonts.google.com/specimen/Source+Code+Pro/license)
+- `esp_panel_drivers_conf.h`, `esp_utils_conf.h`, `lvgl_v8_port.h`, `lvgl_v8_port.cpp` and part of `void setupdisplay()` from [ESP Display Panel](https://github.com/esp-arduino-libs/ESP32_Display_Panel) by ESP Arduino Libs - [Apache-2.0 license](https://github.com/esp-arduino-libs/ESP32_Display_Panel?tab=Apache-2.0-1-ov-file)
+- `index.css` partially reused from [ios-rcs](https://github.com/cupboardunderscore/ios-rcs) - [MIT license](https://github.com/cupboardunderscore/ios-rcs/blob/local/LICENSE)
+- `config.hpp` and begining of `void sendtoclass(String, devices)` generated using [ArduinoJson Assistant](https://arduinojson.org/v7/assistant/)
+- UI created using [EEZ Studio](https://www.envox.eu/studio/studio-introduction/)
