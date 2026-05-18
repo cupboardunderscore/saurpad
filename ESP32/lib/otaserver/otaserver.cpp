@@ -48,7 +48,7 @@ String otaserver::repl(const String &var)
     {
         return ssid;
     }
-    else if (var == rssi)
+    else if (var == "rssi")
     {
         return rssi;
     }
