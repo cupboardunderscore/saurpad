@@ -29,6 +29,7 @@ version = str(build_no) + "_" + datetime.datetime.now().astimezone().strftime("%
 defs = """
 #define defaultname "saurpad"
 #define namestyle "saur\'pad"
+#define fallbackname "saur_pad"
 #define ver "0.1-{}"
 #define mver "0.3"
 #define hver "0.1"

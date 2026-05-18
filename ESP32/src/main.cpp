@@ -148,7 +148,7 @@ void updatedisplay(int page = currentpage)
     int y = 0;
     while (y < page*8 && x < device.size())
     {
-        if (device[x].friendly_name != "" || device[x].get_state() != "0 None" || (device[x].name.startsWith("sensor." + String(defaultname)) && device[x].name.endsWith("_battery")))
+        if (device[x].friendly_name != "" || device[x].get_state() != "0 None" || device[x].name.startsWith("sensor." + String(fallbackname) + "_battery"))
         {
             y++;
         }
@@ -157,17 +157,17 @@ void updatedisplay(int page = currentpage)
     y = 0;
     while (x < device.size() && y < 8)
     {
-        if (device[x].name == "sensor." + String(defaultname) + "_" + uniqueid +  "_battery")
+        if (device[x].name.startsWith("sensor." + String(fallbackname) + "_battery"))
         {
             device[x].set_state(batt);
             device[x].set_updated(lastupdatedsens + "+00:00");
         }
-        else if (device[x].name == "sensor." + String(defaultname) + "_" + uniqueid +  "_illuminance")
+        else if (device[x].name.startsWith("sensor." + String(fallbackname) + "_illuminance"))
         {
             device[x].set_state(lx);
             device[x].set_updated(lastupdatedsens + "+00:00");
         }
-        if (device[x].friendly_name == "" || device[x].get_state() == "0 None" || (device[x].name.startsWith("sensor." + String(defaultname)) && device[x].name.endsWith("_battery")))
+        if (device[x].friendly_name == "" || device[x].get_state() == "0 None" || device[x].name.startsWith("sensor." + String(fallbackname) + "_battery"))
         {
             x++;
             continue;
@@ -293,35 +293,33 @@ void messageHandler(String &topic, String &message)
         done = true;
         updatedisplay();
     }
-    if (topic.startsWith("homeassistant"))
-    {        
-        String newtopic = topic;
-        newtopic.remove(0, newtopic.indexOf('/') + 1);
-        String devname = newtopic.substring(0, newtopic.indexOf('/'));
+    String newtopic = topic;
+    newtopic.remove(0, newtopic.indexOf('/') + 1);
+    String devname = newtopic.substring(0, newtopic.indexOf('/'));
 
-        for (int i = 0; i < device.size(); i++)
+    for (int i = 0; i < device.size(); i++)
+    {
+        if (device[i].name == devname)
         {
-            if (device[i].name == devname)
+            if (message == "remove")
             {
-                if (message == "remove")
-                {
-                    device.erase(device.begin()+i);
-                    return;
-                }
-                sendtoclass(message, device[i]);
+                device.erase(device.begin()+i);
                 return;
             }
-        }
-        if (devname == "homeassistant.homeassistant" || devname == "status.status" || (devname.startsWith("binary_sensor." + String(defaultname)) && devname.endsWith("_charging")) || message == "remove")
-        {
+            sendtoclass(message, device[i]);
             return;
         }
-        devices temp;
-        temp.name = devname;
-        sendtoclass(message, temp);
-        device.push_back(temp);
+    }
+    if (devname == "homeassistant.homeassistant" || devname == "status.status" || devname.startsWith("binary_sensor." + String(fallbackname) + "_charging") || message == "remove")
+    {
         return;
     }
+    devices temp;
+    temp.name = devname;
+    sendtoclass(message, temp);
+    device.push_back(temp);
+    return;
+
 }
 
 void setupdisplay()
@@ -840,13 +838,13 @@ void setup()
         return;
     }
     Serial.println("");
-    if (mqtt.subscribe("#"))
+    if (mqtt.subscribe("homeassistant/#"))
     {
-        Serial.println("Subscribed to topic");
+        Serial.println("Subscribed to topic homeassistant/#");
     }
     else
     {
-        Serial.print("Failed to subscribe to topic");
+        Serial.print("Failed to subscribe to topic homeassistant/#");
         ESP.restart();
     }
     Serial.println("MQTT broker Connected!");
@@ -983,7 +981,7 @@ void loop()
     {
         if (i.friendly_name != "" && i.get_state() != "0 None")
         {
-            if (!(i.name.startsWith("sensor." + String(defaultname)) && i.name.endsWith("_battery")))
+            if (!(i.name.startsWith("sensor." + String(fallbackname) + "_battery")))
             {
                 devicecount++;
             }
