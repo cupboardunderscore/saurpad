@@ -919,7 +919,7 @@ void loop()
     {
         lv_obj_add_flag(objects.mute, LV_OBJ_FLAG_HIDDEN);
     }
-    lv_label_set_text(objects.clock, (String((h12)? loc.hourFormat12() : loc.hour()) + ((loc.second()%2 == 0)? " " : ":") + ((loc.minute() < 10)? ("0" + String(loc.minute())) : String(loc.minute())) + (h12)? (" " + String(loc.isPM()? "pm" : "am")) : "").c_str());
+    lv_label_set_text(objects.clock, ((String((h12)? loc.hourFormat12() : loc.hour())) + ((loc.second()%2 == 0)? " " : ":") + ((loc.minute() < 10)? ("0" + String(loc.minute())) : String(loc.minute())) + ((h12)? (" " + String(loc.isPM()? "pm" : "am")) : "")).c_str());
     if (loc.dayOfYear() != dayofyear)
     {
         dayofyear = loc.dayOfYear();
