@@ -706,7 +706,7 @@ void setup()
     settings.begin(defaultname, false);
     if (!settings.isKey("uniqueid"))
     {
-        String chars = "AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz1234567890";
+        String chars = "abcdefghijklmnopqrstuvwxyz1234567890";
         for (int i = 0; i < 4; i++)
         {
             int t = random(0, chars.length());
