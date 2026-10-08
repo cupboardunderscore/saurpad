@@ -3,13 +3,14 @@
 otaserver::otaserver()
 {
     settings.begin(defaultname, false);
+    sn = settings.getString("uniqueid");
     bauto = settings.getBool("brightness/auto", true);
     brightness = settings.getInt("brightness", 50);
-    drefresh = settings.getInt("intervals/displayrefresh", 500);
-    pswitch = settings.getInt("intervals/pageswitch", 25);
-    sensors = settings.getInt("intervals/sensors", 1);
-    send = settings.getInt("intervals/send", 60);
-    warning = settings.getInt("intervals/warning", 100);
+    drefresh = settings.getInt("int/dispfresh", 500);
+    pswitch = settings.getInt("int/pswitch", 25);
+    sensors = settings.getInt("int/sens", 1);
+    send = settings.getInt("int/send", 60);
+    warning = settings.getInt("int/warn", 100);
     server = new AsyncWebServer(80);
     server->on("/", HTTP_GET, [&](AsyncWebServerRequest *request){request->send(200, "text/html", index_ota, [&](const String &var){return repl(var);});});
     server->on("/upload", HTTP_POST, [&](AsyncWebServerRequest *request){request->send(200);}, [&](AsyncWebServerRequest *request, String filename, size_t index, uint8_t *data, size_t len, bool final){return upload(request, filename, index, data, len, final);});
@@ -23,6 +24,10 @@ String otaserver::repl(const String &var)
     if (var == "name")
     {
         return namestyle;
+    }
+    else if (var == "sn")
+    {
+        return sn;
     }
     else if (var == "v")
     {
@@ -47,6 +52,10 @@ String otaserver::repl(const String &var)
     else if (var == "ssid")
     {
         return ssid;
+    }
+    else if (var == "ip")
+    {
+        return ip;
     }
     else if (var == "rssi")
     {

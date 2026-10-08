@@ -764,6 +764,7 @@ void setup()
     Serial.println("ssid = \"" + settings.getString("wifi/ssid") + "\"");
     lv_label_set_text(objects.startup_text, namestyle);
     lv_label_set_text(objects.startup_subtext, "Connecting to Wi-Fi network");
+    WiFi.enableIPv6();
     if (settings.isKey("wifi/pass"))
     {
         Serial.println("pass = \"" + settings.getString("wifi/pass") + "\"");
@@ -801,6 +802,7 @@ void setup()
     MDNS.addService("_http", "_tcp", 80);
     ota = new otaserver;
     ota->ssid = WiFi.SSID();
+    ota->ip = WiFi.localIP().toString();
 
     Serial.println("mqtt = \"" + settings.getString("mqtt/address") + ":" + settings.getInt("mqtt/port") + "\"");
     Serial.println("username = " + settings.getString("mqtt/user") + ", password = " + settings.getString("mqtt/pass"));

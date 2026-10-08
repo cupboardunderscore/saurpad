@@ -11,6 +11,7 @@
 
 class otaserver
 {
+    String sn;
     AsyncWebServer *server;
     Preferences settings;
     String repl(const String &var);
@@ -24,6 +25,7 @@ public:
     String lig = "Not initialized";
     String bat = "Not initialized";
     String ssid = "Not initialized";
+    String ip = "Not initialized";
     String rssi = "Not initialized";
     bool bauto;
     int brightness;
