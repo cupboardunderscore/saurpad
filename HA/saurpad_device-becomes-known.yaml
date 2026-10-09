@@ -1,5 +1,5 @@
 blueprint:
-  name: saur'pad startup
+  name: saur'pad device becomes known
   domain: automation
   author: cupboard_
   homeassistant:
