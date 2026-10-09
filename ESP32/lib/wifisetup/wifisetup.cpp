@@ -54,42 +54,7 @@ wifisetup::wifisetup()
         int min = 100;
         for (int i = 0; i < n; i++)
         {
-            switch (wc[i])
-            {
-                case 1:
-                    count[0]++;
-                    break;
-                case 2:
-                    count[1]++;
-                    break;
-                case 3:
-                    count[2]++;
-                    break;
-                case 4:
-                    count[3]++;
-                    break;
-                case 5:
-                    count[4]++;
-                    break;
-                case 6:
-                    count[5]++;
-                    break;
-                case 7:
-                    count[6]++;
-                    break;
-                case 8:
-                    count[7]++;
-                    break;
-                case 9:
-                    count[8]++;
-                    break;
-                case 10:
-                    count[9]++;
-                    break;
-                case 11:
-                    count[10]++;
-                    break;
-            }
+            count[wc[i]-1]++;
         }
         for (int i = 0; i < 11; i++)
         {
