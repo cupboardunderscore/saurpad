@@ -26,7 +26,7 @@ actions:
         states.cover, extra_devices) | map(attribute='entity_id')
         | list | reject('is_state', 'unknown') | list | reject('is_state',
         'unavailable') | list | reject('contains', 'sensor.sun') | list |
-        reject('contains', 'sensor.backup_backup_manager_state') | list |
+        reject('contains', 'sensor.backup') | list |
         reject('contains', 'sensor.local_ip') | list }}
       sequence:
         - action: mqtt.publish
