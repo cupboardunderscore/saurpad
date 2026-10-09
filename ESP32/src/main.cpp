@@ -423,7 +423,7 @@ void sensorsloop(void *pvParameters)
             batt = 0;
         }
         lastupdatedsens = now.timestamp();
-        ota->bat = String(batt) + "%%";
+        ota->bat = String(batt) + String((chr8 > 0)? "%% +": "%%");
         ota->lig = String(lx) + " lx";
         ota->rssi = String(rssi) + " dBm";
         delay = millis() - delay;
