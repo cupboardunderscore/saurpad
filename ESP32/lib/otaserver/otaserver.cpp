@@ -17,7 +17,9 @@ otaserver::otaserver()
     server->on("/conf", HTTP_POST, [&](AsyncWebServerRequest *request){request->send(200); resolve(request);});
     server->on("/index.css", HTTP_GET, [](AsyncWebServerRequest *request){request->send(200, "text/css", index_css);});
     server->on("/favicon.ico", HTTP_GET, [](AsyncWebServerRequest *request){request->send(SD, "/" + String(defaultname) + "/favicon.png", "image/png");});
-    server->on("/apple-touch-icon.png", HTTP_GET, [](AsyncWebServerRequest *request){request->send(SD, "/" + String(defaultname) + "/favicon.png", "image/png");});
+    server->on("/apple-touch-icon.png", HTTP_GET, [](AsyncWebServerRequest *request){request->send(SD, "/" + String(defaultname) + "/apple-touch-icon.png", "image/png");});
+    server->on("/favicon-32x32.png", HTTP_GET, [](AsyncWebServerRequest *request){request->send(SD, "/" + String(defaultname) + "/favicon-32x32.png", "image/png");});
+    server->on("/favicon-16x16.png", HTTP_GET, [](AsyncWebServerRequest *request){request->send(SD, "/" + String(defaultname) + "/favicon-16x16.png", "image/png");});
     server->begin();
 }
 

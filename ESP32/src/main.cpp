@@ -82,6 +82,7 @@ unsigned long held1 = 0, held2 = 0;
 String lastupdatedsens = "";
 bool h12 = false;
 String uniqueid = "";
+uint32_t beforenow;
 
 otaserver *ota;
 devices *dv;
@@ -898,11 +899,12 @@ void loop()
         lv_obj_clear_flag(objects.clock, LV_OBJ_FLAG_HIDDEN);
         lvgl_port_unlock();
     }
-    DateTime now;
+    DateTime now(beforenow);
     if (xSemaphoreTake(i2cmutex, 5000))
     {
         now = rtc.now();
         xSemaphoreGive(i2cmutex);
+        beforenow = now.unixtime();
     }
     if (!mqtt.connected())
     {
