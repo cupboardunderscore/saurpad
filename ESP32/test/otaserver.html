@@ -18,6 +18,8 @@
         </header>
         <div class="box">
             <h2>OTA update</h2>
+            <br>
+            <button name="latest" onclick="update(this)">download latest</button>%available%
             <p>
                 <form id="upload_form" enctype="multipart/form-data" method="post">
                     <input type="file" name="file1" id="file1" onchange="upload()">
@@ -147,6 +149,36 @@
             var ajax = new XMLHttpRequest();
             ajax.open("POST", "/conf");
             ajax.send(formdata);
+        }
+        if (!!window.EventSource)
+        {
+            var source = new EventSource("/events");
+            source.addEventListener("progress",
+                function(e)
+                {
+                    var percent = Number(e.data);
+                    _("progressbar").value = percent;
+                    _("status").innerHTML = percent + "%% downloaded";
+                    if (percent >= 100)
+                    {
+                        _("status").innerHTML = "writing file to filesystem";
+                    }
+                }
+            );
+            source.addEventListener("status",
+                function(e)
+                {
+                    if (e.data == "done")
+                    {
+                        _("status").innerHTML = "download complete";
+                        _("progressbar").value = 0;
+                    }
+                    else if (e.data == "error")
+                    {
+                        alert("download failed");
+                    }
+                }
+            );
         }
         </script>
 </body>

@@ -78,7 +78,7 @@ body {
     }
 }
 
-input,select
+input,select,button
 {
     font-size: medium;
 }

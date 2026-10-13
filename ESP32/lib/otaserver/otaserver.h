@@ -7,12 +7,15 @@
 #include <ESPAsyncWebServer.h>
 #include <SD.h>
 #include <Preferences.h>
+#include <HTTPClient.h>
+#include "esp_task_wdt.h"
 #include "defs.hpp"
 
 class otaserver
 {
     String sn;
     AsyncWebServer *server;
+    AsyncEventSource *events;
     Preferences settings;
     String repl(const String &var);
     void upload(AsyncWebServerRequest *request, String filename, size_t index, uint8_t *data, size_t len, bool final);

@@ -12,6 +12,7 @@ otaserver::otaserver()
     send = settings.getInt("int/send", 60);
     warning = settings.getInt("int/warn", 100);
     server = new AsyncWebServer(80);
+    events = new AsyncEventSource("/events");
     server->on("/", HTTP_GET, [&](AsyncWebServerRequest *request){request->send(200, "text/html", index_ota, [&](const String &var){return repl(var);});});
     server->on("/upload", HTTP_POST, [&](AsyncWebServerRequest *request){request->send(200);}, [&](AsyncWebServerRequest *request, String filename, size_t index, uint8_t *data, size_t len, bool final){return upload(request, filename, index, data, len, final);});
     server->on("/conf", HTTP_POST, [&](AsyncWebServerRequest *request){request->send(200); resolve(request);});
@@ -20,6 +21,7 @@ otaserver::otaserver()
     server->on("/apple-touch-icon.png", HTTP_GET, [](AsyncWebServerRequest *request){request->send(SD, "/" + String(defaultname) + "/apple-touch-icon.png", "image/png");});
     server->on("/favicon-32x32.png", HTTP_GET, [](AsyncWebServerRequest *request){request->send(SD, "/" + String(defaultname) + "/favicon-32x32.png", "image/png");});
     server->on("/favicon-16x16.png", HTTP_GET, [](AsyncWebServerRequest *request){request->send(SD, "/" + String(defaultname) + "/favicon-16x16.png", "image/png");});
+    server->addHandler(events);
     server->begin();
 }
 
@@ -97,6 +99,68 @@ String otaserver::repl(const String &var)
     {
         return String(warning);
     }
+    else if (var == "available")
+    {
+        HTTPClient http;
+        http.setTimeout(5000);
+        http.begin(latesturl);
+        http.GET();
+        String aversion = http.getLocation();
+        String cversion(ver);
+        http.end();
+        aversion = aversion.substring(aversion.lastIndexOf('/') + 1);
+        String av(aversion);
+        if (aversion.indexOf('.') == aversion.lastIndexOf('.'))
+        {
+            aversion = aversion + ".0";
+        }
+        cversion = cversion.substring(0, cversion.indexOf('-'));
+        if (cversion.indexOf('.') == cversion.lastIndexOf('.'))
+        {
+            cversion = cversion + ".0";
+        }
+        int a[3], c[3];
+        a[0] = aversion.substring(0, aversion.indexOf('.')).toInt();
+        a[1] = aversion.substring(aversion.indexOf('.') + 1, aversion.lastIndexOf('.') + 1).toInt();
+        a[2] = aversion.substring(aversion.lastIndexOf('.') + 1).toInt();
+        c[0] = cversion.substring(0, cversion.indexOf('.')).toInt();
+        c[1] = cversion.substring(cversion.indexOf('.') + 1, cversion.lastIndexOf('.') + 1).toInt();
+        c[2] = cversion.substring(cversion.lastIndexOf('.') + 1).toInt();
+        if (a[0] > c[0])
+        {
+            return " New version " + av + " available!";
+        }
+        else if (a[0] < c[0])
+        {
+            return "";
+        }
+        else
+        {
+            if (a[1] > c[1])
+            {
+                return " New version " + av + " available!";
+            }
+            else if (a[1] < c[1])
+            {
+                return "";
+            }
+            else
+            {
+                if (a[2] > c[2])
+                {
+                    return " New version " + av + " available!";
+                }
+                else if (a[2] < c[2])
+                {
+                    return "";
+                }
+                else
+                {
+                    return "";
+                }
+            }
+        }
+    }
     return var;
 }
 
@@ -141,6 +205,56 @@ void otaserver::resolve(AsyncWebServerRequest *request)
             warning = value.toInt();
             settings.putInt("int/warn", value.toInt());
         }
+        else if (name == "latest")
+        {
+            HTTPClient http;
+            http.setTimeout(15000);
+            http.setFollowRedirects(HTTPC_FORCE_FOLLOW_REDIRECTS);
+            http.begin(downloadurl);
+            if (http.GET() == HTTP_CODE_OK)
+            {
+                int size = http.getSize();
+                File file = SD.open("/firmware.bin", "w");
+                WiFiClient *stream = http.getStreamPtr();
+                uint8_t buffer[1024];
+                int bytesWritten = 0;
+                stream->setTimeout(2500);
+                int progress = 0;
+                while (true)
+                {
+                    int s = stream->available();
+                    int temprogress = (bytesWritten * 100)/size;
+                    if (temprogress > progress && temprogress%5 == 0)
+                    {
+                        progress = temprogress;
+                        events->send(String(progress).c_str(), "progress", millis());
+                    }
+                    if (s && bytesWritten < size)
+                    {
+                        int len = stream->readBytes(buffer, ((s > sizeof(buffer)) ? sizeof(buffer) : s));
+                        file.write(buffer, len);
+                        bytesWritten += len;
+                    }
+                    else if (!s && bytesWritten < size)
+                    {}
+                    else
+                    {
+                        break;
+                    }
+                    esp_task_wdt_reset();
+                    yield();
+                }
+                file.close();
+                http.end();
+                events->send("done", "status", millis());
+                ESP.restart();
+            }
+            else
+            {
+                http.end();
+                events->send("error", "status", millis());
+            }
+        }
     }
 }
 
@@ -171,4 +285,5 @@ void otaserver::upload(AsyncWebServerRequest *request, String filename, size_t i
 otaserver::~otaserver()
 {
     delete(server);
+    delete(events);
 }
