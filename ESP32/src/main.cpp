@@ -869,6 +869,7 @@ void setup()
     i2cmutex = xSemaphoreCreateMutex();
     if (i2cmutex == NULL)
     {
+        Serial.println("Failed to get I2C mutex");
         ESP.restart();
     }
     xTaskCreatePinnedToCore(sensorsloop, "sens", 10000, NULL, 0, &sens, 0);
@@ -908,6 +909,7 @@ void loop()
     }
     if (!mqtt.connected())
     {
+        Serial.println("MQTT disconnected");
         speak->stop();
         ESP.restart();
     }

@@ -38,22 +38,9 @@ ESP32 based notification center for Home Assistant
 - add [MQTT integration](https://www.home-assistant.io/integrations/mqtt) and install [Mosquitto broker](https://github.com/home-assistant/addons/blob/master/mosquitto/DOCS.md)
 - setup credentials for Mosquitto broker
 - enable [MQTT Discovery](https://www.home-assistant.io/integrations/mqtt#mqtt-discovery)
-- import these automation blueprints
+- import and setup the folowing blueprint
 
-blueprints are configured to work with sensors, binary sensors, air quality and covers\
-additional devices can be added during import process\
-**it is important to add the same devices in every template where asked to**
-
-<details><summary>blueprints</summary>
-
-[![create-device](https://my.home-assistant.io/badges/blueprint_import.svg)](https://my.home-assistant.io/redirect/_change/?redirect=blueprint_import%2F%3Fblueprint_url%3Dhttps%253A%252F%252Fraw.githubusercontent.com%252Fcupboardunderscore%252Fsaurpad%252Frefs%252Fheads%252Fmain%252FHA%252Fsaurpad_create-device.yaml)
-
-[![device-becomes-known](https://my.home-assistant.io/badges/blueprint_import.svg)](https://my.home-assistant.io/redirect/_change/?redirect=blueprint_import%2F%3Fblueprint_url%3Dhttps%253A%252F%252Fraw.githubusercontent.com%252Fcupboardunderscore%252Fsaurpad%252Frefs%252Fheads%252Fmain%252FHA%252Fsaurpad_device-becomes-known.yaml)
-
-[![startup](https://my.home-assistant.io/badges/blueprint_import.svg)](https://my.home-assistant.io/redirect/_change/?redirect=blueprint_import%2F%3Fblueprint_url%3Dhttps%253A%252F%252Fraw.githubusercontent.com%252Fcupboardunderscore%252Fsaurpad%252Frefs%252Fheads%252Fmain%252FHA%252Fsaurpad_startup.yaml)
-
-[![state-update](https://my.home-assistant.io/badges/blueprint_import.svg)](https://my.home-assistant.io/redirect/_change/?redirect=blueprint_import%2F%3Fblueprint_url%3Dhttps%253A%252F%252Fraw.githubusercontent.com%252Fcupboardunderscore%252Fsaurpad%252Frefs%252Fheads%252Fmain%252FHA%252Fsaurpad_state-update.yaml)
-</details>
+[![blueprint](https://my.home-assistant.io/badges/blueprint_import.svg)](https://my.home-assistant.io/redirect/_change/?redirect=blueprint_import%2F%3Fblueprint_url%3Dhttps%253A%252F%252Fraw.githubusercontent.com%252Fcupboardunderscore%252Fsaurpad%252Frefs%252Fheads%252Fmain%252FHA%252Fsaurpad.yaml)
 
 ### ESP32
 - download `firmware.bin` from the releases page

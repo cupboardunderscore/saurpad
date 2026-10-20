@@ -32,8 +32,8 @@ defs = """
 #define fallbackname "saur_pad"
 #define latesturl "https://github.com/cupboardunderscore/saurpad/releases/latest"
 #define downloadurl "https://github.com/cupboardunderscore/saurpad/releases/latest/download/firmware.bin"
-#define ver "0.1-{}"
-#define mver "0.3"
+#define ver "0.2-{}"
+#define mver "0.4"
 #define hver "0.1"
 
 #define SD_CS 10
