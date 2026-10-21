@@ -286,8 +286,8 @@ void messageHandler(String &topic, String &message)
 {
     if (topic == "homeassistant/status" && message == "online")
     {
-        mqtt.publish(String(defaultname) + "/" + uniqueid, "online");
         mqtt.publish("homeassistant/device/" + String(defaultname) + "_" + uniqueid + "/config", jsn(uniqueid), false, 1);
+        mqtt.publish(String(defaultname) + "/" + uniqueid, "online");
     }
     else if (topic == "homeassistant/done" && message == "done")
     {
@@ -456,6 +456,7 @@ void sendloop(void *pvParameters)
         String pub = "{\"temperature\": " + String(tem.temperature) + ", \"humidity\": " + String(hum.relative_humidity) + ", \"illuminance\": " + String(lx) + ", \"battery\": " + String(batt) + ", \"battery_charging\": " + String((chr8 > 0)? "\"ON\"" : "\"OFF\"") + "}";
         Serial.println(pub);
         mqtt.publish(String(defaultname) + "/" + uniqueid + "/state", pub);
+        ota->update();
         vTaskDelay((ota->send * 1000) / portTICK_PERIOD_MS);
     }
 }

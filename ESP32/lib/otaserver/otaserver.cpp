@@ -227,7 +227,7 @@ void otaserver::resolve(AsyncWebServerRequest *request)
                     if (temprogress > progress && temprogress%5 == 0)
                     {
                         progress = temprogress;
-                        events->send(String(progress).c_str(), "progress", millis());
+                        events->send(String(progress), "progress", millis());
                     }
                     if (s && bytesWritten < size)
                     {
@@ -280,6 +280,15 @@ void otaserver::upload(AsyncWebServerRequest *request, String filename, size_t i
             ESP.restart();
         }
     }
+}
+
+void otaserver::update()
+{
+    events->send(tem, "tem", millis());
+    events->send(hum.substring(0, hum.indexOf('%')+1), "hum", millis());
+    events->send(lig, "lig", millis());
+    events->send(bat.substring(0, bat.indexOf('%')+1), "bat", millis());
+    events->send(rssi, "rssi", millis());
 }
 
 otaserver::~otaserver()

@@ -37,6 +37,7 @@ public:
     int sensors;
     int send;
     int warning;
+    void update();
     ~otaserver();
 };
 #endif // OTASERVER_H

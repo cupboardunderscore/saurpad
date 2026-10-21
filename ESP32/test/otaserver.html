@@ -30,20 +30,20 @@
             </p>
             <p id="status"></p>
             <h2>sensors</h2>
-            Temperature = %tem%
+            Temperature = <a id="tem">%tem%</a>
             <br>
-            Humidity = %hum%
+            Humidity = <a id="hum">%hum%</a>
             <br>
-            Light = %lig%
+            Light = <a id="lig">%lig%</a>
             <br>
-            Battery = %bat%
+            Battery = <a id="bat">%bat%</a>
             <br>
             <br>
             SSID = %ssid%
             <br>
             IP = %ip%
             <br>
-            RSSI = %rssi%
+            RSSI = <a id="rssi">%rssi%</a>
             <br>
             <br>
             <div style="cursor: pointer;" onclick="showhide()">
@@ -177,6 +177,36 @@
                     {
                         alert("download failed");
                     }
+                }
+            );
+            source.addEventListener("tem",
+                function(e)
+                {
+                    _("tem").innerHTML = e.data;
+                }
+            );
+            source.addEventListener("hum",
+                function(e)
+                {
+                    _("hum").innerHTML = e.data;
+                }
+            );
+            source.addEventListener("lig",
+                function(e)
+                {
+                    _("lig").innerHTML = e.data;
+                }
+            );
+            source.addEventListener("bat",
+                function(e)
+                {
+                    _("bat").innerHTML = e.data;
+                }
+            );
+            source.addEventListener("rssi",
+                function(e)
+                {
+                    _("rssi").innerHTML = e.data;
                 }
             );
         }
