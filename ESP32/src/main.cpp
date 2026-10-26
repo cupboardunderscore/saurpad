@@ -23,6 +23,7 @@
 #include <ArduinoJson.h>
 #include <ESPmDNS.h>
 #include <nvs_flash.h>
+#include <esp_wifi.h>
 
 #include "defs.hpp"
 #include "wifisetup.h"
@@ -293,6 +294,10 @@ void messageHandler(String &topic, String &message)
     {
         done = true;
         updatedisplay();
+    }
+    else if (topic == "homeassistant/nightmode")
+    {
+        ota->setnightmode(message == "ON");
     }
     String newtopic = topic;
     newtopic.remove(0, newtopic.indexOf('/') + 1);
@@ -767,6 +772,8 @@ void setup()
     lv_label_set_text(objects.startup_text, namestyle);
     lv_label_set_text(objects.startup_subtext, "Connecting to Wi-Fi network");
     WiFi.enableIPv6();
+    WiFi.mode(WIFI_STA);
+    esp_wifi_set_ps(WIFI_PS_MIN_MODEM);
     if (settings.isKey("wifi/pass"))
     {
         Serial.println("pass = \"" + settings.getString("wifi/pass") + "\"");
@@ -879,6 +886,7 @@ void setup()
     xTaskCreatePinnedToCore(blinkloop, "blnk", 10000, NULL, 0, &blnk, 0);
     xTaskCreatePinnedToCore(buttonloop, "btn", 10000, NULL, 0, &btn, 0);
     loadScreen(SCREEN_ID_MAIN);
+    WiFi.setTxPower(WIFI_POWER_MINUS_1dBm);
 }
 
 void loop()

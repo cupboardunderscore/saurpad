@@ -67,6 +67,10 @@ String otaserver::repl(const String &var)
     {
         return rssi;
     }
+    else if (var == "nightmode")
+    {
+        return (nightmode)? "checked" : "";
+    }
     else if (var == "auto")
     {
         return (bauto)? "checked" : "";
@@ -160,6 +164,10 @@ String otaserver::repl(const String &var)
                 }
             }
         }
+    }
+    else if (var == "night")
+    {
+        return (nightmode)? "disabled" : "";
     }
     return var;
 }
@@ -255,6 +263,31 @@ void otaserver::resolve(AsyncWebServerRequest *request)
                 events->send("error", "status", millis());
             }
         }
+        else if (name == "nightmode")
+        {
+            if (value == "true")
+            {
+                nightmode = true;
+                bauto = false;
+                brightness = 10;
+                drefresh = 5000;
+                pswitch = 30;
+                sensors = 300;
+                send = 300;
+                warning = 5000;
+            }
+            else
+            {
+                nightmode = false;
+                bauto = settings.getBool("brightness/auto", true);
+                brightness = settings.getInt("brightness", 50);
+                drefresh = settings.getInt("int/dispfresh", 500);
+                pswitch = settings.getInt("int/pswitch", 25);
+                sensors = settings.getInt("int/sens", 1);
+                send = settings.getInt("int/send", 60);
+                warning = settings.getInt("int/warn", 100);
+            }
+        }
     }
 }
 
@@ -289,6 +322,32 @@ void otaserver::update()
     events->send(lig, "lig", millis());
     events->send(bat.substring(0, bat.indexOf('%')+1), "bat", millis());
     events->send(rssi, "rssi", millis());
+}
+
+void otaserver::setnightmode(bool mode)
+{
+    nightmode = mode;
+    events->send((nightmode)? "ON": "OFF", "nightmode", millis());
+    if (nightmode)
+    {
+        bauto = false;
+        brightness = 10;
+        drefresh = 5000;
+        pswitch = 30;
+        sensors = 300;
+        send = 300;
+        warning = 5000;
+    }
+    else
+    {
+        bauto = settings.getBool("brightness/auto", true);
+        brightness = settings.getInt("brightness", 50);
+        drefresh = settings.getInt("int/dispfresh", 500);
+        pswitch = settings.getInt("int/pswitch", 25);
+        sensors = settings.getInt("int/sens", 1);
+        send = settings.getInt("int/send", 60);
+        warning = settings.getInt("int/warn", 100);
+    }
 }
 
 otaserver::~otaserver()

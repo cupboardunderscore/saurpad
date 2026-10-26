@@ -13,6 +13,7 @@
 
 class otaserver
 {
+    bool nightmode = false;
     String sn;
     AsyncWebServer *server;
     AsyncEventSource *events;
@@ -38,6 +39,7 @@ public:
     int send;
     int warning;
     void update();
+    void setnightmode(bool mode);
     ~otaserver();
 };
 #endif // OTASERVER_H

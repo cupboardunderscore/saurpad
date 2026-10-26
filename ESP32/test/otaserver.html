@@ -51,20 +51,22 @@
                 <i id="arrow" style="border: solid var(--grey-900); border-width: 0 3px 3px 0; display: inline-block; padding: 3px; transform: rotate(45deg);"></i>
             </div>
             <div id="conf" style="display: none;">
+                <br>
+                <input type="checkbox" id="nightmode" %nightmode% onchange="night()"> <a title="slows down intervals and lowers brightness">night mode</a>
                 <h4>brightness</h4>
-                <input type="checkbox" id="autocheck" %auto% onchange="auto()"> auto
+                <input type="checkbox" id="autocheck" %auto% %night% onchange="auto()"> auto
                 <br>
-                <input name="manual" id="manual" %man% type="number" value="%manual%" onchange="update(this)"> 
+                <input name="manual" id="manual" %man% %night% type="number" value="%manual%" onchange="update(this)">
                 <h4>intervals</h4>
-                display refresh <input name="display" type="number" value="%display%" onchange="update(this)"> ms
+                display refresh <input name="display" id="display" %night% type="number" value="%display%" onchange="update(this)"> ms
                 <br>
-                screen change <input name="screen" type="number" value="%screen%" onchange="update(this)"> s
+                screen change <input name="screen" id="screen" %night% type="number" value="%screen%" onchange="update(this)"> s
                 <br>
-                <a title="ambient light & battery capacity">sensors 1 </a><input name="sensors" type="number" value="%sensors%" onchange="update(this)"> s
+                <a title="ambient light & battery capacity">sensors 1 </a><input name="sensors" id="sensors" %night% type="number" value="%sensors%" onchange="update(this)"> s
                 <br>
-                <a title="temperature & relative humidity">sensors 2 </a><input name="mqtt" type="number" value="%mqtt%" onchange="update(this)"> s
+                <a title="temperature & relative humidity">sensors 2 </a><input name="mqtt" id="mqtt" %night% type="number" value="%mqtt%" onchange="update(this)"> s
                 <br>
-                warning check <input name="warning" type="number" value="%warning%" onchange="update(this)"> ms
+                warning check <input name="warning" id="warning" %night% type="number" value="%warning%" onchange="update(this)"> ms
             </div>
         </div>
     </div>
@@ -142,6 +144,46 @@
             ajax.open("POST", "/conf");
             ajax.send(formdata);
         }
+        function night()
+        {
+            var formdata = new FormData();
+            if (_("nightmode").checked)
+            {
+                nighton();
+                formdata.append("nightmode", true);
+            }
+            else
+            {
+               nightoff();
+                formdata.append("nightmode", false);
+            }
+            var ajax = new XMLHttpRequest();
+            ajax.open("POST", "/conf");
+            ajax.send(formdata);
+        }
+        function nighton()
+        {
+            _("autocheck").disabled = true;
+            _("manual").disabled = true;
+            _("display").disabled = true;
+            _("screen").disabled = true;
+            _("sensors").disabled = true;
+            _("mqtt").disabled = true;
+            _("warning").disabled = true;
+
+            _("autocheck").checked = false;
+            _("manual").style = "";
+            _("manual").value = 10;
+            _("display").value = 5000;
+            _("screen").value = 30;
+            _("sensors").value = 300;
+            _("mqtt").value = 300;
+            _("warning").value = 5000;
+        }
+        function nightoff()
+        {
+            location.reload(true);
+        }
         function update(el)
         {
             var formdata = new FormData();
@@ -207,6 +249,21 @@
                 function(e)
                 {
                     _("rssi").innerHTML = e.data;
+                }
+            );
+            source.addEventListener("nightmode",
+                function(e)
+                {
+                    if (e.data == "ON")
+                    {
+                        _("nightmode").checked = true;
+                        nighton();
+                    }
+                    else
+                    {
+                        _("nightmode").checked = false;
+                        nightoff();
+                    }
                 }
             );
         }
