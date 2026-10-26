@@ -83,7 +83,7 @@ unsigned long held1 = 0, held2 = 0;
 String lastupdatedsens = "";
 bool h12 = false;
 String uniqueid = "";
-uint32_t beforenow;
+uint32_t beforenow = 0;
 
 otaserver *ota;
 devices *dv;
@@ -289,15 +289,22 @@ void messageHandler(String &topic, String &message)
     {
         mqtt.publish("homeassistant/device/" + String(defaultname) + "_" + uniqueid + "/config", jsn(uniqueid), false, 1);
         mqtt.publish(String(defaultname) + "/" + uniqueid, "online");
+        return;
     }
     else if (topic == "homeassistant/done" && message == "done")
     {
         done = true;
         updatedisplay();
+        return;
     }
     else if (topic == "homeassistant/nightmode")
     {
         ota->setnightmode(message == "ON");
+        return;
+    }
+    else if (topic.startsWith("homeassistant/device"))
+    {
+        return;
     }
     String newtopic = topic;
     newtopic.remove(0, newtopic.indexOf('/') + 1);
@@ -316,7 +323,7 @@ void messageHandler(String &topic, String &message)
             return;
         }
     }
-    if (devname == "homeassistant.homeassistant" || devname == "status.status" || devname.startsWith("binary_sensor." + String(fallbackname) + "_charging") || message == "remove")
+    if (devname.startsWith("binary_sensor." + String(fallbackname) + "_charging") || message == "remove")
     {
         return;
     }
@@ -410,24 +417,30 @@ void sensorsloop(void *pvParameters)
         unsigned long delay = millis();
         rssi = WiFi.RSSI();
         DateTime now;
-        float batV;
+        float tempbatt = 0;
+        float templx = 0;
         if (xSemaphoreTake(i2cmutex, 10000))
         {
-            batt = bat.cellPercent();
-            batV = bat.cellVoltage();
+            tempbatt = bat.cellPercent();
             chr8 = bat.chargeRate();
-            lx = lght.readLux(VEML_LUX_AUTO);
+            templx = lght.readLux(VEML_LUX_AUTO);
             now = rtc.now();
             xSemaphoreGive(i2cmutex);
         }
-        if (batt > 100)
+        if (tempbatt > 100)
         {
-            batt = 100;
+            tempbatt = 100;
         }
-        else if (batt < 0)
+        else if (!(tempbatt >= 0))
         {
-            batt = 0;
+            tempbatt = 0;
         }
+        if (!(templx >= 0))
+        {
+            templx = 0;
+        }
+        batt = tempbatt;
+        lx = templx;
         lastupdatedsens = now.timestamp();
         ota->bat = String(batt) + String((chr8 > 0)? "%% +": "%%");
         ota->lig = String(lx) + " lx";
@@ -912,9 +925,13 @@ void loop()
     DateTime now(beforenow);
     if (xSemaphoreTake(i2cmutex, 5000))
     {
-        now = rtc.now();
+        DateTime tempnow = rtc.now();
         xSemaphoreGive(i2cmutex);
-        beforenow = now.unixtime();
+        if (tempnow.unixtime() != 2313941504)
+        {
+            now = tempnow;
+            beforenow = now.unixtime();
+        }
     }
     if (!mqtt.connected())
     {
