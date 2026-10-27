@@ -498,7 +498,7 @@ void warningloop(void *pvParameters)
             }
             if (tmp.device_class == "")
             {
-                blonk = "default";
+                blonk = tmp.name.substring(0, tmp.name.indexOf('.'));
             }
             else
             {
@@ -521,11 +521,11 @@ void warningloop(void *pvParameters)
                 speak->clear();
                 delay = delay - info.duration;
             }
-            if (SD.exists("/" + String(defaultname) + "/" + tmp.device_class + ".mp3"))
+            if (SD.exists("/" + String(defaultname) + "/" + blonk + ".mp3"))
             {
                 MP3Decoder::MP3Info info;
-                MP3Player::playFile("/" + String(defaultname) + "/" + tmp.device_class + ".mp3", volume);
-                MP3Player::getFileInfo("/" + String(defaultname) + "/" + tmp.device_class + ".mp3", &info);
+                MP3Player::playFile("/" + String(defaultname) + "/" + blonk + ".mp3", volume);
+                MP3Player::getFileInfo("/" + String(defaultname) + "/" + blonk + ".mp3", &info);
                 speak->clear();
                 delay = delay - info.duration;
             }

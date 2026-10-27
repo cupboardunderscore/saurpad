@@ -49,7 +49,7 @@ ESP32 based notification center for Home Assistant
 - additional configuration and OTA updates can be made on a web server hosted on device
 
 #### custom warning conditions
-- send a MQTT message on topic `homeassistant/<device_id>/status` formatted `{"warning": "ON/OFF"}`
+- send a MQTT message on topic `homeassistant/<device_id>` formatted `{"warning": "on/off"}`
 
 #### custom audio/led pattern
 - create a folder named `saurpad` on an SD card
