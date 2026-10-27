@@ -485,6 +485,7 @@ void warningloop(void *pvParameters)
     {
         if (!wanl.empty())
         {
+            String type = "";
             String temp = wanl[0];
             wanl.erase(wanl.begin());
             devices tmp;
@@ -499,10 +500,12 @@ void warningloop(void *pvParameters)
             if (tmp.device_class == "")
             {
                 blonk = tmp.name.substring(0, tmp.name.indexOf('.'));
+                type = tmp.name.substring(0, tmp.name.indexOf('.'));
             }
             else
             {
                 blonk = tmp.device_class;
+                type = tmp.device_class;
             }
             lv_obj_clear_flag(objects.warn, LV_OBJ_FLAG_HIDDEN);
             lv_label_set_text(objects.warn_name, tmp.friendly_name.c_str());
@@ -521,11 +524,11 @@ void warningloop(void *pvParameters)
                 speak->clear();
                 delay = delay - info.duration;
             }
-            if (SD.exists("/" + String(defaultname) + "/" + blonk + ".mp3"))
+            if (SD.exists("/" + String(defaultname) + "/" + type + ".mp3"))
             {
                 MP3Decoder::MP3Info info;
-                MP3Player::playFile("/" + String(defaultname) + "/" + blonk + ".mp3", volume);
-                MP3Player::getFileInfo("/" + String(defaultname) + "/" + blonk + ".mp3", &info);
+                MP3Player::playFile("/" + String(defaultname) + "/" + type + ".mp3", volume);
+                MP3Player::getFileInfo("/" + String(defaultname) + "/" + type + ".mp3", &info);
                 speak->clear();
                 delay = delay - info.duration;
             }
